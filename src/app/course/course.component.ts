@@ -16,7 +16,7 @@ import {
 import {merge, fromEvent, Observable, concat} from 'rxjs';
 import {Lesson} from '../model/lesson';
 import {createHttpObservable} from '../common/util';
-import {Store} from '../common/store.service';
+import {debug, RxJsLoggingLevel, setRxJsLoggingLevel} from '../common/debug';
 
 
 @Component({
@@ -26,7 +26,7 @@ import {Store} from '../common/store.service';
 })
 export class CourseComponent implements OnInit, AfterViewInit {
 
-    courseId:number;
+    courseId:string;
 
     course$ : Observable<Course>;
 
@@ -35,7 +35,7 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     @ViewChild('searchInput', { static: true }) input: ElementRef;
 
-    constructor(private route: ActivatedRoute, private store: Store) {
+    constructor(private route: ActivatedRoute) {
 
 
     }
@@ -44,23 +44,27 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
         this.courseId = this.route.snapshot.params['id'];
 
-        this.course$ = this.store.selectCourseById(this.courseId);
+        this.course$ = createHttpObservable(`/api/courses/${this.courseId}`)
+            .pipe(
+                debug( RxJsLoggingLevel.INFO, "course value "),
+            );
+
+        setRxJsLoggingLevel(RxJsLoggingLevel.TRACE);
 
     }
 
     ngAfterViewInit() {
 
-        const searchLessons$ =  fromEvent<any>(this.input.nativeElement, 'keyup')
+        this.lessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
             .pipe(
                 map(event => event.target.value),
+                startWith(''),
+                debug( RxJsLoggingLevel.TRACE, "search "),
                 debounceTime(400),
                 distinctUntilChanged(),
-                switchMap(search => this.loadLessons(search))
+                switchMap(search => this.loadLessons(search)),
+                debug( RxJsLoggingLevel.DEBUG, "lessons value ")
             );
-
-        const initialLessons$ = this.loadLessons();
-
-        this.lessons$ = concat(initialLessons$, searchLessons$);
 
     }
 
