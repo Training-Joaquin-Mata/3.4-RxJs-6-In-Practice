@@ -1,13 +1,6 @@
-# Dependencies
+.git
 node_modules
-
-# Output
-dist
-.cache
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.DS_Store
+.idea
+npm-debug.log
+dist/
