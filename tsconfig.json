@@ -7,7 +7,7 @@
     "strict": true,                                   
     //"skipLibCheck": true,
      "outDir": "dist",
-     "lib": ["dom", "ES6"],
-     "noImplicitAny": true,
+     "lib": ["dom", "es2017"],
+     "noImplicitAny": false,
   }
 }
